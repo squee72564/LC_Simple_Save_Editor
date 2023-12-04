@@ -16,3 +16,5 @@ This is a simple python tool that allows you to change parameters within the enc
 6. Press the submit button.
 
 The save file should now be re-encrypted with the edited information.
+
+Within LC_Simple_Save_Editor/src/encryption/encryptTools.py are the functions to actually encrypt and decrypt the save files.
