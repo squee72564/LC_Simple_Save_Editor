@@ -341,15 +341,15 @@ if __name__ == '__main__':
     inc_button.grid(row=5, column=1, sticky=tk.W+tk.E)
 
     seed_var = tk.BooleanVar()
-    seed_check = tk.Checkbutton(frm, text='Shuffle Seed?', variable=seed_var)
+    seed_check = tk.Checkbutton(frm, text='Shuffle Seed', variable=seed_var)
     seed_check.grid(row=6, column=0, sticky=tk.W+tk.E, pady=10)
 
     tele_var = tk.BooleanVar()
-    tele_check = tk.Checkbutton(frm, text='Unlock Teleporter if not purchased?', variable=tele_var)
+    tele_check = tk.Checkbutton(frm, text='Unlock Teleporter', variable=tele_var)
     tele_check.grid(row=7, column=0, sticky=tk.W+tk.E, pady=10)
 
     inv_var = tk.BooleanVar()
-    inv_check = tk.Checkbutton(frm, text='Unlock Inverse Teleporter if not purchased?', variable=inv_var)
+    inv_check = tk.Checkbutton(frm, text='Unlock Inverse Teleporter', variable=inv_var)
     inv_check.grid(row=8, column=0, sticky=tk.W+tk.E, pady=10)
 
     scrollbar = tk.Scrollbar(frm, orient=tk.VERTICAL)
