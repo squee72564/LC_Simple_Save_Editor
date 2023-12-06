@@ -57,6 +57,13 @@ def on_remove_item(*args):
         item_pos.pop(selected_index)
         item_info.pop(selected_index)
 
+        if items_listbox.size() > 0:
+            next_idx = min(selected_index, items_listbox.size()-1)
+            items_listbox.select_set(next_idx)
+            items_listbox.event_generate('<<ListboxSelect>>')
+        else:
+            items_listbox.selection_clear(0, tk.END)
+
 # Used to select a item in the listbox
 def on_select(event):
     selected_index = items_listbox.curselection()
