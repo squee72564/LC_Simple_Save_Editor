@@ -384,7 +384,7 @@ if __name__ == '__main__':
 
     [items_listbox.insert(tk.END, items[_id]) if _id in items
             else items_listbox.insert(tk.END, f'unknown id {_id}') for _id in item_ids]
-    
+
     selected_item_text = tk.StringVar(frm, f'none:\nx: n/a\ny: n/a\nz: n/a\n')
     selected_item_label = tk.Label(frm, textvariable=selected_item_text)
     selected_item_label.grid(row=9, column=2, pady=10,padx=10)
@@ -400,7 +400,7 @@ if __name__ == '__main__':
     scrap_price_text.grid(row=10, column=1, sticky=tk.W+tk.E, pady=10)
     
     selected_dropdown_value = tk.StringVar(frm, '')
-    item_dropdown = tk.OptionMenu(frm, selected_dropdown_value, *items.values())
+    item_dropdown = tk.OptionMenu(frm, selected_dropdown_value, *sorted(items.values()))
     item_dropdown.grid(row=11, column=2, sticky=tk.W+tk.E, padx=10, pady=10)
 
     item_add_button = tk.Button(frm, text='Add Item', command=on_add_item)
