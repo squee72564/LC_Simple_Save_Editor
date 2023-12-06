@@ -380,7 +380,6 @@ if __name__ == '__main__':
             print(f'There is an unknown item of id {_id}', file=sys.stderr)
             item_info.append((f'Unknown Item id {_id}', None))
 
-    print(f'loaded in with {len(item_info)} items')
     [items_listbox.insert(tk.END, items[_id]) if _id in items
             else items_listbox.insert(tk.END, f'unknown id {_id}') for _id in item_ids]
     
