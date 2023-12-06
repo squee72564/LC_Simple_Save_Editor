@@ -114,10 +114,16 @@ def submit(data):
     if tele and 5 not in data['UnlockedShipObjects']['value']:
         data['UnlockedShipObjects']['value'].append(5)
         data['ShipUnlockStored_Teleporter'] = {'__type':'bool', 'value': True}
+    elif not tele and 5 in data['UnlockedShipObjects']['value']:
+        data['UnlockedShipObjects']['value'].remove(5)
+        data['ShipUnlockStored_Teleporter'] = {'__type':'bool', 'value': False}
 
     if inv and 19 not in data['UnlockedShipObjects']['value']:
         data['UnlockedShipObjects']['value'].append(19)
         data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': True}
+    elif not inv and 19 in data['UnlockedShipObjects']['value']:
+        data['UnlockedShipObjects']['value'].remove(19)
+        data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': False}
 
     decrypted_result = json.dumps(data)
 
