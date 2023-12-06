@@ -4,28 +4,96 @@ import random
 import sys
 import json
 
-# Helper function used with button
+selected_item_idx = 0
+
+# Used with button to increment moon
 def incrementMoon(planet_var, planets, planet_str):
     value = planet_var.get()    
     planet_var.set((value + 1) % len(planets))
     planet_str.set(planets[planet_var.get()])
 
+# Used to validate numeric input for tkinter
+def validate_numeric(value):
+    return value.isnumeric() or value == ''
+
+# Used with entry to change scrap value for selected item
+def on_entry_change(*args):
+    if selected_item_idx < len(item_info):
+        item_name, scrap_info = item_info[selected_item_idx]
+        item_id = item_ids[selected_item_idx]
+        value = scrap_price_var.get()
+        if value != '' and value != '0' and item_id in scrap:
+            scrap_idx, scrap_value = scrap_info
+            item_values[scrap_idx] = int(value)
+            item_info[selected_item_idx] = (item_name, (scrap_idx, int(value)))
+
+# Used with button to add new item
+def on_add_item(*args):
+    val = selected_dropdown_value.get()
+    if val in items.values():
+        key = items_rev_mapping[val]
+        item_ids.append(key)
+        item_pos.append({'x':0, 'y':0, 'z':0})
+        if key in scrap:
+            num = 30
+            item_values.append(num)
+            item_info.append((val, (len(item_values)-1, num)))
+        else:
+            item_info.append((val, ()))
+        items_listbox.insert(tk.END, val)
+
+def on_remove_item(*args):
+    global selected_item_idx
+
+    selected_index = items_listbox.curselection()
+    if selected_index:
+        selected_index = selected_index[0]
+        items_listbox.delete(selected_index)
+        scrap_idx = sum(1 for item in item_ids[:selected_index] if item in scrap)
+        item_values.pop(scrap_idx)
+        item_ids.pop(selected_index)
+        item_pos.pop(selected_index)
+        item_info.pop(selected_index)
+
+# Used to select a item in the listbox
+def on_select(event):
+    global selected_item_idx
+
+    selected_index = items_listbox.curselection()
+    if selected_index:
+        selected_index = selected_index[0]
+        selected_item_idx = selected_index
+        item_name, scrap_info = item_info[selected_index]
+        x,y,z = item_pos[selected_index]['x'], item_pos[selected_index]['y'], item_pos[selected_index]['z']
+        value = ''
+        if item_ids[selected_index] in scrap:
+            scrap_idx, scrap_value = scrap_info
+            value = str(scrap_value)
+        scrap_price_entry.delete(0, tk.END)
+        scrap_price_entry.insert(0, value)
+        selected_item_text.set(f'{item_name}:\nx: {x:^}\ny: {y:^}\nz: {z:^}\n')
+
 # Helper function that is called when the submit button is pressed in GUI
-def submit():
+def submit(data):
+    data['shipScrapValues']['value'] = item_values
+    data['shipGrabbableItemIDs']['value'] = item_ids
+    data['shipGrabbableItemPos']['value'] = item_pos
+
     # Get values from GUI Entry fields
     starting_cash = credits_entry.get()
+    if starting_cash == '': starting_cash = '60'
     deadline = deadline_entry.get()
+    if deadline == '': deadline = '3240'
     steps = steps_entry.get()
+    if steps == '': steps = '0'
     days = days_entry.get()
+    if days == '': days = '0'
     quota = quota_entry.get()
+    if quota == '': quota = '160'
     seed = seed_var.get()
     planet_id = planet_var.get()
     tele = tele_var.get()
     inv = inv_var.get()
-
-    # Load decrypted data into dict and overwrite with new values
-    decrypted_result = decrypt(password, sys.argv[1])
-    data = json.loads(decrypted_result)
 
     data['GroupCredits']['value'] = int(starting_cash)
     data['DeadlineTime']['value'] = int(deadline)
@@ -68,9 +136,6 @@ if __name__ == '__main__':
         print(f"Usage: {sys.argv[0]} <filepath>",file=sys.stderr)
         sys.exit(1)
 
-    def validate_numeric(value):
-        return value.isnumeric()
-
     # Password 
     password = "lcslime14a5"
 
@@ -78,10 +143,12 @@ if __name__ == '__main__':
     data = {} 
     try:
         data = json.loads(decrypt(password, sys.argv[1]))
-        if 'GroupCredits' not in data or 'DeadlineTime' not in data or 'Stats_StepsTaken' not in data or 'Stats_DaysSpent' not in data or 'ProfitQuota' not in data or 'CurrentPlanetID' not in data:
+        if 'GroupCredits' not in data or 'DeadlineTime' not in data \
+                or 'Stats_StepsTaken' not in data or 'Stats_DaysSpent' not in data \
+                or 'ProfitQuota' not in data or 'CurrentPlanetID' not in data:
            raise Exception('File is not a valid Lethal Company save file!') 
     except Exception as e:
-        print(f'{e}')
+        print(f'{e}', file=sys.stderr)
         sys.exit(1)
     
     init_credits = data['GroupCredits']['value']
@@ -90,17 +157,142 @@ if __name__ == '__main__':
     init_days = data['Stats_DaysSpent']['value']
     init_quota = data['ProfitQuota']['value']
     init_planetid = data['CurrentPlanetID']['value']
-
-    planets = {0:'Experimentation', 1:'Assurance', 2:'Vow', 3:'Company Building',4:'March',5:'Rend',6:'Dine',7:'Offense',8:'Titan'}
     
+    item_values = []
+    item_ids = []
+    item_pos = []
+
+    # Data related to items; this data may not be present in file
+    items = {
+            0:'binoculars',
+            1:'boom box',
+            3:'flashlight',
+            4:'jetpack',
+            5:'key',
+            6:'lockpick',
+            7:'apparatus',
+            8:'handheld monitor',
+            9:'pro flashlight',
+            10:'shovel',
+            11:'flashbang',
+            12:'extension ladder',
+            13:'tzp inhalant',
+            14:'walkie talkie',
+            15:'stun gun',
+            16:'magic 7 ball',
+            17:'airhorn',
+            18:'bell',
+            19:'big bolt',
+            20:'bottles',
+            21:'hairbrush',
+            22:'candy',
+            23:'cash register',
+            24:'chemical jug',
+            25:'clown horn',
+            26:'large axel',
+            27:'teeth',
+            28:'dustpan',
+            29:'egg beater',
+            30:'v type engine',
+            31:'golden cup',
+            32:'lamp',
+            33:'painting',
+            34:'plastic fish',
+            35:'laser pointer',
+            36:'gold bar',
+            37:'hairdryer',
+            38:'magnifying glass',
+            39:'tattered metal sheet',
+            40:'cookie mold pan',
+            41:'coffee mug',
+            42:'perfume bottle',
+            43:'old phone',
+            44:'jar of pickles',
+            45:'pill bottle',
+            47:'ring',
+            48:'robot toy',
+            49:'rubber ducky',
+            50:'red soda',
+            51:'steering wheel',
+            52:'stop sign',
+            53:'tea kettle',
+            54:'toothpaste',
+            55:'toy cube',
+            56:'bee hive',
+            57:'yield sign',
+            58:'radar booster',
+    }
+
+    items_rev_mapping = {v:k for k,v in items.items()}
+
+    not_in_game = {
+        0:'binoculars',
+        8:'handheld monitor',
+    }
+
+    scrap = {
+            7:'apparatus',
+            16:'magic 7 ball',
+            17:'airhorn',
+            18:'bell',
+            19:'big bolt',
+            20:'bottles',
+            21:'hairbrush',
+            22:'candy',
+            23:'cash register',
+            24:'chemical jug',
+            25:'clown horn',
+            26:'large axel',
+            27:'teeth',
+            28:'dustpan',
+            29:'egg beater',
+            30:'v type engine',
+            31:'golden cup',
+            32:'lamp',
+            33:'painting',
+            34:'plastic fish',
+            35:'laser pointer',
+            36:'gold bar',
+            37:'hairdryer',
+            38:'magnifying glass',
+            39:'tattered metal sheet',
+            40:'cookie mold pan',
+            41:'coffee mug',
+            42:'perfume bottle',
+            43:'old phone',
+            44:'jar of pickles',
+            45:'pill bottle',
+            47:'ring',
+            48:'robot',
+            49:'rubber ducky',
+            50:'red soda',
+            51:'steering wheel',
+            52:'stop sign',
+            53:'tea kettle',
+            54:'toothpaste',
+            55:'toy cube',
+            56:'bee hive',
+            57:'yield sign',
+    }
+
+    if 'shipScrapValues' in data and 'shipGrabbableItemIDs' in data and 'shipGrabbableItemPos' in data:
+        item_values = data['shipScrapValues']['value']
+        item_ids = data['shipGrabbableItemIDs']['value']
+        item_pos = data['shipGrabbableItemPos']['value']
+    else:
+        data['shipScrapValues'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
+        data['shipGrabbableItemIDs'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
+        data['shipGrabbableItemPos'] = {'__type':'UnityEngine.Vector3[],UnityEngine.CoreModule', 'value':[]}
+        
     # Setting up GUI elements
     root = tk.Tk()
-    root.geometry('500x500')
+    root.geometry('600x700')
     root.title('LC Simple Save Editor')
     
     frm = tk.Frame(root)
     frm.columnconfigure(0, weight=1)
     frm.columnconfigure(1, weight=1)
+    frm.columnconfigure(2, weight=1)
 
     vcmd = (frm.register(validate_numeric), '%P')
     
@@ -134,6 +326,8 @@ if __name__ == '__main__':
     quota_text = tk.Label(frm, text='Current Quota: ')
     quota_text.grid(row=4, column=0, sticky=tk.W+tk.E, pady=10)
     
+    planets = {0:'Experimentation', 1:'Assurance', 2:'Vow', 3:'Company Building',4:'March',5:'Rend',6:'Dine',7:'Offense',8:'Titan'}
+
     planet_var = tk.IntVar()
     planet_var.set(int(init_planetid))
     planet_str = tk.StringVar()
@@ -155,8 +349,52 @@ if __name__ == '__main__':
     inv_check = tk.Checkbutton(frm, text='Unlock Inverse Teleporter if not purchased?', variable=inv_var)
     inv_check.grid(row=8, column=0, sticky=tk.W+tk.E, pady=10)
 
-    submit_btn = tk.Button(frm, text='Submit', font=('Arial', 18), command=submit)
-    submit_btn.grid(row=9, column=0, sticky=tk.W+tk.E, pady=10)
+    scrollbar = tk.Scrollbar(frm, orient=tk.VERTICAL)
+    items_listbox = tk.Listbox(frm, yscrollcommand=scrollbar.set, selectmode=tk.SINGLE)
+    items_listbox.grid(row=0, column=2, rowspan=8, sticky=tk.N+tk.S, padx = 10, pady=10)
+    
+    item_info = []
+    scrap_idx = 0
+    for _id in item_ids:
+        if _id in scrap:
+            item_info.append((items[_id], (scrap_idx, item_values[scrap_idx])))
+            scrap_idx += 1
+        elif _id in items:
+            item_info.append((items[_id], ()))
+        else: 
+            print(f'There is an unknown item of id {_id}', file=sys.stderr)
+            item_info.append((f'Unknown Item id {_id}', ()))
+
+    print(f'loaded in with {len(item_info)} items')
+    [items_listbox.insert(tk.END, items[_id]) if _id in items
+            else items_listbox.insert(tk.END, f'unknown id {_id}') for _id in item_ids]
+    
+    selected_item_text = tk.StringVar(frm, f'none:\nx: n/a\ny: n/a\nz: n/a\n')
+    selected_item_label = tk.Label(frm, textvariable=selected_item_text)
+    selected_item_label.grid(row=9, column=2, pady=10,padx=10)
+
+    items_listbox.bind('<<ListboxSelect>>', on_select)
+
+    scrap_price_var = tk.StringVar()
+    scrap_price_var.trace_add('write', on_entry_change)
+    scrap_price_entry = tk.Entry(frm, textvariable=scrap_price_var, validate='key', validatecommand=vcmd)
+    scrap_price_entry.insert(0, 0)
+    scrap_price_entry.grid(row=10, column=2, sticky=tk.W+tk.E, pady=10)
+    scrap_price_text = tk.Label(frm, text='Scrap Price: ')
+    scrap_price_text.grid(row=10, column=1, sticky=tk.W+tk.E, pady=10)
+    
+    selected_dropdown_value = tk.StringVar(frm, '')
+    item_dropdown = tk.OptionMenu(frm, selected_dropdown_value, *items.values())
+    item_dropdown.grid(row=11, column=2, sticky=tk.W+tk.E, padx=10, pady=10)
+
+    item_add_button = tk.Button(frm, text='Add Item', command=on_add_item)
+    item_add_button.grid(row=12,column=2, sticky=tk.W+tk.E, pady=10, padx=10)
+
+    item_remove_button = tk.Button(frm, text='Remove Item', command=on_remove_item)
+    item_remove_button.grid(row=13,column=2, sticky=tk.W+tk.E, pady=10, padx=10)
+
+    submit_btn = tk.Button(frm, text='Overwite Save', font=('Arial', 18), command=lambda: submit(data))
+    submit_btn.grid(row=11, column=0, sticky=tk.W+tk.E, pady=10)
     
     frm.pack()
 
