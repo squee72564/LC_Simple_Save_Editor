@@ -53,7 +53,7 @@ def on_remove_item(*args):
             scrap_idx = sum(1 for item in item_ids[:selected_index] if item in scrap)
             item_values.pop(scrap_idx)
 
-            
+        selected_item_text.set(f'none:\nx: n/a\ny: n/a\nz: n/a\n')            
 
         item_ids.pop(selected_index)
         item_pos.pop(selected_index)
