@@ -23,7 +23,8 @@ def on_entry_change(*args):
         item_id = item_ids[selected_item_idx]
         value = scrap_price_var.get()
         if value != '' and value != '0' and item_id in scrap:
-            scrap_idx, scrap_value = scrap_info
+            _, scrap_value = scrap_info
+            scrap_idx = sum(1 for item in item_ids[:selected_item_idx] if item in scrap)
             item_values[scrap_idx] = int(value)
             item_info[selected_item_idx] = (item_name, (scrap_idx, int(value)))
 
@@ -49,8 +50,13 @@ def on_remove_item(*args):
     if selected_index:
         selected_index = selected_index[0]
         items_listbox.delete(selected_index)
-        scrap_idx = sum(1 for item in item_ids[:selected_index] if item in scrap)
-        item_values.pop(scrap_idx)
+
+        if item_ids[selected_index] in scrap:
+            scrap_idx = sum(1 for item in item_ids[:selected_index] if item in scrap)
+            item_values.pop(scrap_idx)
+
+            
+
         item_ids.pop(selected_index)
         item_pos.pop(selected_index)
         item_info.pop(selected_index)
@@ -67,7 +73,7 @@ def on_select(event):
         x,y,z = item_pos[selected_index]['x'], item_pos[selected_index]['y'], item_pos[selected_index]['z']
         value = ''
         if item_ids[selected_index] in scrap:
-            scrap_idx, scrap_value = scrap_info
+            _, scrap_value = scrap_info
             value = str(scrap_value)
         scrap_price_entry.delete(0, tk.END)
         scrap_price_entry.insert(0, value)
@@ -354,11 +360,11 @@ if __name__ == '__main__':
     items_listbox.grid(row=0, column=2, rowspan=8, sticky=tk.N+tk.S, padx = 10, pady=10)
     
     item_info = []
-    scrap_idx = 0
+    ini_scrap_idx = 0
     for _id in item_ids:
         if _id in scrap:
-            item_info.append((items[_id], (scrap_idx, item_values[scrap_idx])))
-            scrap_idx += 1
+            item_info.append((items[_id], (ini_scrap_idx, item_values[ini_scrap_idx])))
+            ini_scrap_idx += 1
         elif _id in items:
             item_info.append((items[_id], ()))
         else: 
