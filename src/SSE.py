@@ -4,8 +4,6 @@ import random
 import sys
 import json
 
-selected_item_idx = 0
-
 # Used with button to increment moon
 def incrementMoon(planet_var, planets, planet_str):
     value = planet_var.get()    
@@ -18,13 +16,15 @@ def validate_numeric(value):
 
 # Used with entry to change scrap value for selected item
 def on_entry_change(*args):
-    if selected_item_idx < len(item_info):
-        item_name, scrap_val = item_info[selected_item_idx]
+    selected_index = items_listbox.curselection()
+    if selected_index and selected_index[0] < len(item_info):
+        selected_index = selected_index[0]
+        item_name, scrap_val = item_info[selected_index]
         value = scrap_price_var.get()
-        if value != '' and value != '0' and item_ids[selected_item_idx] in scrap:
-            scrap_idx = sum(1 for item in item_ids[:selected_item_idx] if item in scrap)
+        if value != '' and value != '0' and item_ids[selected_index] in scrap:
+            scrap_idx = sum(1 for item in item_ids[:selected_index] if item in scrap)
             item_values[scrap_idx] = int(value)
-            item_info[selected_item_idx] = (item_name, int(value))
+            item_info[selected_index] = (item_name, int(value))
 
 # Used with button to add new item
 def on_add_item(*args):
@@ -42,8 +42,6 @@ def on_add_item(*args):
         items_listbox.insert(tk.END, val)
 
 def on_remove_item(*args):
-    global selected_item_idx
-
     selected_index = items_listbox.curselection()
     if selected_index:
         selected_index = selected_index[0]
@@ -61,12 +59,9 @@ def on_remove_item(*args):
 
 # Used to select a item in the listbox
 def on_select(event):
-    global selected_item_idx
-
     selected_index = items_listbox.curselection()
     if selected_index:
         selected_index = selected_index[0]
-        selected_item_idx = selected_index
         item_name, scrap_value = item_info[selected_index]
         x,y,z = item_pos[selected_index]['x'], item_pos[selected_index]['y'], item_pos[selected_index]['z']
         value = ''
