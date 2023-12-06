@@ -19,14 +19,12 @@ def validate_numeric(value):
 # Used with entry to change scrap value for selected item
 def on_entry_change(*args):
     if selected_item_idx < len(item_info):
-        item_name, scrap_info = item_info[selected_item_idx]
-        item_id = item_ids[selected_item_idx]
+        item_name, scrap_val = item_info[selected_item_idx]
         value = scrap_price_var.get()
-        if value != '' and value != '0' and item_id in scrap:
-            _, scrap_value = scrap_info
+        if value != '' and value != '0' and item_ids[selected_item_idx] in scrap:
             scrap_idx = sum(1 for item in item_ids[:selected_item_idx] if item in scrap)
             item_values[scrap_idx] = int(value)
-            item_info[selected_item_idx] = (item_name, (scrap_idx, int(value)))
+            item_info[selected_item_idx] = (item_name, int(value))
 
 # Used with button to add new item
 def on_add_item(*args):
@@ -38,9 +36,9 @@ def on_add_item(*args):
         if key in scrap:
             num = 30
             item_values.append(num)
-            item_info.append((val, (len(item_values)-1, num)))
+            item_info.append((val, num))
         else:
-            item_info.append((val, ()))
+            item_info.append((val, None))
         items_listbox.insert(tk.END, val)
 
 def on_remove_item(*args):
@@ -69,11 +67,10 @@ def on_select(event):
     if selected_index:
         selected_index = selected_index[0]
         selected_item_idx = selected_index
-        item_name, scrap_info = item_info[selected_index]
+        item_name, scrap_value = item_info[selected_index]
         x,y,z = item_pos[selected_index]['x'], item_pos[selected_index]['y'], item_pos[selected_index]['z']
         value = ''
         if item_ids[selected_index] in scrap:
-            _, scrap_value = scrap_info
             value = str(scrap_value)
         scrap_price_entry.delete(0, tk.END)
         scrap_price_entry.insert(0, value)
@@ -363,13 +360,13 @@ if __name__ == '__main__':
     ini_scrap_idx = 0
     for _id in item_ids:
         if _id in scrap:
-            item_info.append((items[_id], (ini_scrap_idx, item_values[ini_scrap_idx])))
+            item_info.append((items[_id], item_values[ini_scrap_idx]))
             ini_scrap_idx += 1
         elif _id in items:
-            item_info.append((items[_id], ()))
+            item_info.append((items[_id], None))
         else: 
             print(f'There is an unknown item of id {_id}', file=sys.stderr)
-            item_info.append((f'Unknown Item id {_id}', ()))
+            item_info.append((f'Unknown Item id {_id}', None))
 
     print(f'loaded in with {len(item_info)} items')
     [items_listbox.insert(tk.END, items[_id]) if _id in items
