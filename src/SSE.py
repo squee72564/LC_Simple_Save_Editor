@@ -168,9 +168,9 @@ if __name__ == '__main__':
     init_planetid = data['CurrentPlanetID']['value']
     init_tele = False
     init_inv = False
-    if 5 in data['UnlockedShipObjects']['value']:
+    if 'UnlockedShipObjects' in data and 5 in data['UnlockedShipObjects']['value']:
         init_tele = True 
-    if 19 in data['UnlockedShipObjects']['value']:
+    if 'UnlockedShipObjects' in data and 19 in data['UnlockedShipObjects']['value']:
         init_inv = True
 
     item_values = []
@@ -234,8 +234,8 @@ if __name__ == '__main__':
             54:'toothpaste',
             55:'toy cube',
             56:'bee hive',
-            57:'yield sign',
-            58:'radar booster',
+            57:'radar booster',
+            58:'yield sign',
     }
 
     items_rev_mapping = {v:k for k,v in items.items()}
@@ -287,7 +287,7 @@ if __name__ == '__main__':
             54:'toothpaste',
             55:'toy cube',
             56:'bee hive',
-            57:'yield sign',
+            58:'yield sign',
     }
 
     if 'shipScrapValues' in data and 'shipGrabbableItemIDs' in data and 'shipGrabbableItemPos' in data:
