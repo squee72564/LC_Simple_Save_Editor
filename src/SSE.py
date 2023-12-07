@@ -1,5 +1,6 @@
 from encryption.encryptTools import encrypt, decrypt
 import tkinter as tk
+from tkinter import filedialog
 import random
 import sys
 import json
@@ -136,32 +137,38 @@ def submit(data):
     # Encrypt and overwrite LV save file
     encrypted_result = encrypt(password, './prev_decrypted_file')
 
-    with open(sys.argv[1], 'wb') as encrypted_file:
+    with open(file_path, 'wb') as encrypted_file:
         encrypted_file.write(encrypted_result)
     
     root.destroy()
     sys.exit()
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <filepath>",file=sys.stderr)
-        sys.exit(1)
+
+    data = {}
+    file_path = ''
+    
+    if len(sys.argv) == 2:
+        file_path = sys.argv[1]
+    else:
+        file_path = filedialog.askopenfilename(title="Select a file")
+        if not file_path:
+            sys.exit(1)
 
     # Password 
     password = "lcslime14a5"
-
+            
     # Initially grab data from file to populate initial Entry fields within GUI; if exception thrown quit
-    data = {} 
     try:
-        data = json.loads(decrypt(password, sys.argv[1]))
+        data = json.loads(decrypt(password, file_path))
         if 'GroupCredits' not in data or 'DeadlineTime' not in data \
                 or 'Stats_StepsTaken' not in data or 'Stats_DaysSpent' not in data \
                 or 'ProfitQuota' not in data or 'CurrentPlanetID' not in data:
-           raise Exception('File is not a valid Lethal Company save file!') 
+            raise Exception('File is not a valid Lethal Company save file!') 
     except Exception as e:
-        print(f'{e}', file=sys.stderr)
+        print(f'Exception when loading file: {e}', file=sys.stderr)
         sys.exit(1)
-    
+        
     init_credits = data['GroupCredits']['value']
     init_deadline = data['DeadlineTime']['value']
     init_steps = data['Stats_StepsTaken']['value']
