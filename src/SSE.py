@@ -96,6 +96,10 @@ def submit(data):
     if days == '': days = '0'
     quota = quota_entry.get()
     if quota == '': quota = '160'
+    quota_passed = quota_passed_entry.get()
+    if quota_passed == '': quota_passed = '0'
+    quota_fulfilled = quota_fulfilled_entry.get()
+    if quota_fulfilled == '': quota_fulfilled = '0'
     seed = seed_var.get()
     planet_id = planet_var.get()
     tele = tele_var.get()
@@ -174,6 +178,8 @@ if __name__ == '__main__':
     init_steps = data['Stats_StepsTaken']['value']
     init_days = data['Stats_DaysSpent']['value']
     init_quota = data['ProfitQuota']['value']
+    init_quota_passed = data['QuotasPassed']['value']
+    init_quota_fulfilled = data['QuotaFulfilled']['value']
     init_planetid = data['CurrentPlanetID']['value']
     init_tele = False
     init_inv = False
@@ -349,6 +355,18 @@ if __name__ == '__main__':
     quota_entry.grid(row=4, column=1, sticky=tk.W+tk.E, pady=10)
     quota_text = tk.Label(frm, text='Current Quota: ')
     quota_text.grid(row=4, column=0, sticky=tk.W+tk.E, pady=10)
+
+    quota_fulfilled_entry = tk.Entry(frm, validate='key', validatecommand=vcmd)
+    quota_fulfilled_entry.insert(0, init_quota_fulfilled)
+    quota_fulfilled_entry.grid(row=5, column=1, sticky=tk.W+tk.E, pady=10)
+    quota_fulfilled_text = tk.Label(frm, text='Quota Amount Fulfilled: ')
+    quota_fulfilled_text.grid(row=5, column=0, sticky=tk.W+tk.E, pady=10)
+
+    quota_passed_entry = tk.Entry(frm, validate='key', validatecommand=vcmd)
+    quota_passed_entry.insert(0, init_quota_passed)
+    quota_passed_entry.grid(row=6, column=1, sticky=tk.W+tk.E, pady=10)
+    quota_passed_text = tk.Label(frm, text='Quotas Completed: ')
+    quota_passed_text.grid(row=6, column=0, sticky=tk.W+tk.E, pady=10)
     
     planets = {0:'Experimentation', 1:'Assurance', 2:'Vow', 3:'Company Building',4:'March',5:'Rend',6:'Dine',7:'Offense',8:'Titan'}
 
@@ -357,25 +375,25 @@ if __name__ == '__main__':
     planet_str = tk.StringVar()
     planet_str.set(planets[planet_var.get()])
     planet_text = tk.Label(frm, textvariable=planet_str)
-    planet_text.grid(row=5, column=0, sticky=tk.W+tk.E)
+    planet_text.grid(row=7, column=0, sticky=tk.W+tk.E)
     inc_button = tk.Button(frm, text='Change Moon', command=lambda: incrementMoon(planet_var, planets, planet_str))
-    inc_button.grid(row=5, column=1, sticky=tk.W+tk.E)
+    inc_button.grid(row=7, column=1, sticky=tk.W+tk.E)
 
     seed_var = tk.BooleanVar()
     seed_check = tk.Checkbutton(frm, text='Shuffle Seed', variable=seed_var)
-    seed_check.grid(row=6, column=0, sticky=tk.W+tk.E, pady=10)
+    seed_check.grid(row=8, column=0, sticky=tk.W+tk.E, pady=10)
 
     tele_var = tk.BooleanVar(frm, init_tele)
     tele_check = tk.Checkbutton(frm, text='Unlock Teleporter', variable=tele_var)
-    tele_check.grid(row=7, column=0, sticky=tk.W+tk.E, pady=10)
+    tele_check.grid(row=9, column=0, sticky=tk.W+tk.E, pady=10)
 
     inv_var = tk.BooleanVar(frm, init_inv)
     inv_check = tk.Checkbutton(frm, text='Unlock Inverse Teleporter', variable=inv_var)
-    inv_check.grid(row=8, column=0, sticky=tk.W+tk.E, pady=10)
+    inv_check.grid(row=10, column=0, sticky=tk.W+tk.E, pady=10)
 
     scrollbar = tk.Scrollbar(frm, orient=tk.VERTICAL)
     items_listbox = tk.Listbox(frm, yscrollcommand=scrollbar.set, selectmode=tk.SINGLE)
-    items_listbox.grid(row=0, column=2, rowspan=8, sticky=tk.N+tk.S, padx = 10, pady=10)
+    items_listbox.grid(row=0, rowspan=8, column=2, sticky=tk.N+tk.S, padx = 10, pady=10)
     
     item_info = []
     ini_scrap_idx = 0
