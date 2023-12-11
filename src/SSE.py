@@ -193,7 +193,7 @@ if __name__ == '__main__':
     item_pos = []
 
     # Data related to items; this data may not be present in file
-    items = {
+    items_v40 = {
             0:'binoculars',
             1:'boom box',
             3:'flashlight',
@@ -253,6 +253,21 @@ if __name__ == '__main__':
             58:'yield sign',
     }
 
+    items_v45 = {
+        59:'shotgun',
+        60:'shotgun shell',
+        61:'spray paint',
+        62:'homemade flashbang',
+        63:'gift box',
+        64:'flask',
+        65:'tragedy',
+        66:'comedy',
+        67:'whoopie cushion',
+    }
+    
+    # Use the intersection for whatever versions you want
+    items = items_v40 | items_v45
+
     items_rev_mapping = {v:k for k,v in items.items()}
 
     not_in_game = {
@@ -260,7 +275,7 @@ if __name__ == '__main__':
         8:'handheld monitor',
     }
 
-    scrap = {
+    scrap_v40 = {
             7:'apparatus',
             16:'magic 7 ball',
             17:'airhorn',
@@ -304,6 +319,16 @@ if __name__ == '__main__':
             56:'bee hive',
             58:'yield sign',
     }
+
+    scrap_v45 = {
+        63:'gift box',        
+        64:'flask',
+        65:'tragedy',
+        66:'comedy',
+        67:'whoopie cushion',
+    }
+
+    scrap = scrap_v40 | scrap_v45
 
     if 'shipScrapValues' in data and 'shipGrabbableItemIDs' in data and 'shipGrabbableItemPos' in data:
         item_values = data['shipScrapValues']['value']
