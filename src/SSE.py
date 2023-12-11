@@ -321,6 +321,9 @@ if __name__ == '__main__':
     }
 
     scrap_v45 = {
+        59:'shotgun',
+        60:'shotgun shell',
+        62:'homemade flashbang',
         63:'gift box',        
         64:'flask',
         65:'tragedy',
@@ -338,7 +341,7 @@ if __name__ == '__main__':
         data['shipScrapValues'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
         data['shipGrabbableItemIDs'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
         data['shipGrabbableItemPos'] = {'__type':'UnityEngine.Vector3[],UnityEngine.CoreModule', 'value':[]}
-        
+    
     # Setting up GUI elements
     root = tk.Tk()
     root.geometry('600x700')
