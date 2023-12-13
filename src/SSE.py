@@ -38,6 +38,14 @@ def on_add_item(*args):
             num = 30
             item_values.append(num)
             item_info.append((val, num))
+        elif key in save_items:
+            num =20 
+            item_info.append((val, None))
+
+            if key == 'shotgun':
+                save_data.append(1)
+            if key == 'shotgun shell':
+                save_data.append(0)
         else:
             item_info.append((val, None))
         items_listbox.insert(tk.END, val)
@@ -51,6 +59,10 @@ def on_remove_item(*args):
         if item_ids[selected_index] in scrap:
             scrap_idx = sum(1 for item in item_ids[:selected_index] if item in scrap)
             item_values.pop(scrap_idx)
+
+        if item_ids[selected_index] in save_items:
+            idx = sum(1 for item in item_ids[:selected_index] if item in save_items)
+            save_data.pop(idx)
 
         selected_item_text.set(f'none:\nx: n/a\ny: n/a\nz: n/a\n')            
 
@@ -73,8 +85,10 @@ def on_select(event):
         item_name, scrap_value = item_info[selected_index]
         x,y,z = item_pos[selected_index]['x'], item_pos[selected_index]['y'], item_pos[selected_index]['z']
         value = ''
+
         if item_ids[selected_index] in scrap:
             value = str(scrap_value)
+
         scrap_price_entry.delete(0, tk.END)
         scrap_price_entry.insert(0, value)
         selected_item_text.set(f'{item_name}:\nx: {x:^}\ny: {y:^}\nz: {z:^}\n')
@@ -84,6 +98,7 @@ def submit(data):
     data['shipScrapValues']['value'] = item_values
     data['shipGrabbableItemIDs']['value'] = item_ids
     data['shipGrabbableItemPos']['value'] = item_pos
+    data['shipItemSaveData']['value'] = save_data
 
     # Get values from GUI Entry fields
     starting_cash = credits_entry.get()
@@ -191,6 +206,7 @@ if __name__ == '__main__':
     item_values = []
     item_ids = []
     item_pos = []
+    save_data = []
 
     # Data related to items; this data may not be present in file
     items_v40 = {
@@ -322,7 +338,7 @@ if __name__ == '__main__':
 
     scrap_v45 = {
         59:'shotgun',
-        60:'shotgun shell',
+        #60:'shotgun shell',
         62:'homemade flashbang',
         63:'gift box',        
         64:'flask',
@@ -333,14 +349,34 @@ if __name__ == '__main__':
 
     scrap = scrap_v40 | scrap_v45
 
-    if 'shipScrapValues' in data and 'shipGrabbableItemIDs' in data and 'shipGrabbableItemPos' in data:
+    save_itemsv45 = {
+        59:'shotgun',
+        60:'shotgun shell',
+    }
+
+    save_items = save_itemsv45
+
+
+    if 'shipScrapValues' in data:
         item_values = data['shipScrapValues']['value']
-        item_ids = data['shipGrabbableItemIDs']['value']
-        item_pos = data['shipGrabbableItemPos']['value']
     else:
         data['shipScrapValues'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
+
+    if 'shipGrabbableItemIDs' in data:
+        item_ids = data['shipGrabbableItemIDs']['value']
+    else:
         data['shipGrabbableItemIDs'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
+
+    if 'shipGrabbableItemPos' in data:
+        item_pos = data['shipGrabbableItemPos']['value']
+    else:
         data['shipGrabbableItemPos'] = {'__type':'UnityEngine.Vector3[],UnityEngine.CoreModule', 'value':[]}
+
+    if 'shipItemSaveData' in data:
+        save_data = data['shipItemSaveData']['value']
+    else:
+        data['shipItemSaveData'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
+
     
     # Setting up GUI elements
     root = tk.Tk()
@@ -434,6 +470,12 @@ if __name__ == '__main__':
         else: 
             print(f'There is an unknown item of id {_id}', file=sys.stderr)
             item_info.append((f'Unknown Item id {_id}', None))
+
+        if _id in save_items:
+            if items[_id] == 'shotgun':
+                save_data.append(1)
+            if items[_id] == 'shotgun shell':
+                save_data.append(0)
 
     [items_listbox.insert(tk.END, items[_id]) if _id in items
             else items_listbox.insert(tk.END, f'unknown id {_id}') for _id in item_ids]
