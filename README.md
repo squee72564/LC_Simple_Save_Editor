@@ -20,6 +20,11 @@ git clone https://github.com/squee72564/LC_Simple_Save_Editor.git
 ```
 python .\SSE.py ~\AppData\LocalLow\ZeekerssRBLX\Lethal Company\LCSaveFile1
 ```
+* Alternatively you can just run the python script without passing in a file path and you will be prompted to select a file in the gui
+
+```
+python .\SSE.py
+```
 
 5. Change the text fields, check boxes, and edit items as desired.
 6. Press the overwrite button.
