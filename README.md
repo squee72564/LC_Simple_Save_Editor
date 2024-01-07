@@ -1,8 +1,9 @@
+
 # Lethal Company Simple Save Editor
 This is a simple python tool that allows you to change parameters within the encrypted LC save files.
 
 ## Requirements:
-1. [Python](https://www.python.org/downloads/)
+1. [Python](https://www.python.org/downloads/) (I use version 3.11.2 and there may be conflicts with older versions)
 2. [pycryptodome package](https://pypi.org/project/pycryptodome/)
 3. Existing Lethal Company save file
 
@@ -13,14 +14,14 @@ This is a simple python tool that allows you to change parameters within the enc
 git clone https://github.com/squee72564/LC_Simple_Save_Editor.git
 ```
 
-2. Install necessary python packages. This can be done by typing "pip install -r requirements.txt" in the base directory.
+2. Install necessary python packages. This can be done by typing `pip install -r requirements.txt` in the base directory.
 3. Navigate to the src directory
 4. Run the python script SSE.py with the file path of the save file to change as a command line argument, ie:
 
 ```
 python .\SSE.py ~\AppData\LocalLow\ZeekerssRBLX\Lethal Company\LCSaveFile1
 ```
-* Alternatively you can just run the python script without passing in a file path and you will be prompted to select a file in the gui
+* Alternatively you can just run the python script without passing in a file path and you will be prompted to select a file in the gui. (Doing it this way may be problematic if the folder where the save file is located is hidden.)
 
 ```
 python .\SSE.py
