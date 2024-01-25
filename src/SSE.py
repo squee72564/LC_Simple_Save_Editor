@@ -176,7 +176,11 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         file_path = sys.argv[1]
     else:
-        file_path = filedialog.askopenfilename(title="Select a file")
+        if sys.platform == 'win32':
+            file_path = filedialog.askopenfilename(title="Select a LC save file", initialdir='~/AppData/LocalLow/ZeekerssRBLX/Lethal Company/')
+        else:
+            file_path = filedialog.askopenfilename(title="Select a LC save file")
+
         if not file_path:
             sys.exit(1)
 
