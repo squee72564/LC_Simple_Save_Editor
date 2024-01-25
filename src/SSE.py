@@ -119,6 +119,7 @@ def submit(data):
     planet_id = planet_var.get()
     tele = tele_var.get()
     inv = inv_var.get()
+    upgrades = upgrades_var.get()
 
     data['GroupCredits']['value'] = int(starting_cash)
     data['DeadlineTime']['value'] = int(deadline)
@@ -135,17 +136,22 @@ def submit(data):
 
     if tele and 5 not in data['UnlockedShipObjects']['value']:
         data['UnlockedShipObjects']['value'].append(5)
-        data['ShipUnlockStored_Teleporter'] = {'__type':'bool', 'value': True}
+        #data['ShipUnlockStored_Teleporter'] = {'__type':'bool', 'value': True}
     elif not tele and 5 in data['UnlockedShipObjects']['value']:
         data['UnlockedShipObjects']['value'].remove(5)
-        data['ShipUnlockStored_Teleporter'] = {'__type':'bool', 'value': False}
+        #data['ShipUnlockStored_Teleporter'] = {'__type':'bool', 'value': False}
 
     if inv and 19 not in data['UnlockedShipObjects']['value']:
         data['UnlockedShipObjects']['value'].append(19)
-        data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': True}
+        #data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': True}
     elif not inv and 19 in data['UnlockedShipObjects']['value']:
         data['UnlockedShipObjects']['value'].remove(19)
-        data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': False}
+        #data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': False}
+
+    if upgrades:
+        [ data['UnlockedShipObjects']['value'].append(_id) for _id in range(0,24) if _id not in data['UnlockedShipObjects']['value'] and _id not in [5,19]]
+    else:
+        [ data['UnlockedShipObjects']['value'].remove(_id) for _id in range(0,24) if _id in data['UnlockedShipObjects']['value'] and _id not in [5,19]]
 
     decrypted_result = json.dumps(data)
 
@@ -180,10 +186,12 @@ if __name__ == '__main__':
     # Initially grab data from file to populate initial Entry fields within GUI; if exception thrown quit
     try:
         data = json.loads(decrypt(password, file_path))
-        if 'GroupCredits' not in data or 'DeadlineTime' not in data \
-                or 'Stats_StepsTaken' not in data or 'Stats_DaysSpent' not in data \
-                or 'ProfitQuota' not in data or 'CurrentPlanetID' not in data:
+
+        required_keys = ['GroupCredits','DeadlineTime','Stats_StepsTaken','Stats_DaysSpent','ProfitQuota','CurrentPlanetID']
+
+        if not all(key in data for key in required_keys): 
             raise Exception('File is not a valid Lethal Company save file!') 
+
     except Exception as e:
         print(f'Exception when loading file: {e}', file=sys.stderr)
         sys.exit(1)
@@ -198,10 +206,15 @@ if __name__ == '__main__':
     init_planetid = data['CurrentPlanetID']['value']
     init_tele = False
     init_inv = False
+    init_upgrades = False
+
     if 'UnlockedShipObjects' in data and 5 in data['UnlockedShipObjects']['value']:
         init_tele = True 
     if 'UnlockedShipObjects' in data and 19 in data['UnlockedShipObjects']['value']:
         init_inv = True
+    if 'UnlockedShipObjects' in data and all(_id in data['UnlockedShipObjects']['value'] \
+            for _id in range(0,24) if _id not in (15, 9)):
+        init_upgrades = True
 
     item_values = []
     item_ids = []
@@ -455,6 +468,10 @@ if __name__ == '__main__':
     inv_check = tk.Checkbutton(frm, text='Unlock Inverse Teleporter', variable=inv_var)
     inv_check.grid(row=10, column=0, sticky=tk.W+tk.E, pady=10)
 
+    upgrades_var = tk.BooleanVar(frm, init_upgrades)
+    upgrades_check = tk.Checkbutton(frm, text='Unlock all other upgrades', variable=upgrades_var)
+    upgrades_check.grid(row=11, column=0, sticky=tk.W+tk.E, pady=10)
+
     scrollbar = tk.Scrollbar(frm, orient=tk.VERTICAL)
     items_listbox = tk.Listbox(frm, yscrollcommand=scrollbar.set, selectmode=tk.SINGLE)
     items_listbox.grid(row=0, rowspan=8, column=2, sticky=tk.N+tk.S, padx = 10, pady=10)
@@ -499,13 +516,13 @@ if __name__ == '__main__':
     item_dropdown.grid(row=11, column=2, sticky=tk.W+tk.E, padx=10, pady=10)
 
     item_add_button = tk.Button(frm, text='Add Item', command=on_add_item)
-    item_add_button.grid(row=12,column=2, sticky=tk.W+tk.E, pady=10, padx=10)
+    item_add_button.grid(row=12, column=2, sticky=tk.W+tk.E, pady=10, padx=10)
 
     item_remove_button = tk.Button(frm, text='Remove Item', command=on_remove_item)
-    item_remove_button.grid(row=13,column=2, sticky=tk.W+tk.E, pady=10, padx=10)
+    item_remove_button.grid(row=13, column=2, sticky=tk.W+tk.E, pady=10, padx=10)
 
     submit_btn = tk.Button(frm, text='Overwite Save', font=('Arial', 18), command=lambda: submit(data))
-    submit_btn.grid(row=11, column=0, sticky=tk.W+tk.E, pady=10)
+    submit_btn.grid(row=12, column=0, sticky=tk.W+tk.E, pady=10)
     
     frm.pack()
 
