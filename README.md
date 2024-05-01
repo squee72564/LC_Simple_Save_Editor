@@ -2,6 +2,11 @@
 # Lethal Company Simple Save Editor
 This is a simple python tool that allows you to change parameters within the encrypted LC save files.
 
+## Updated for v50!
+New features added include:
+- New planets
+- New kitchen knife and easter egg items
+
 ## Requirements:
 1. [Python](https://www.python.org/downloads/) (I use version 3.11.2 and there may be conflicts with older versions)
 2. [pycryptodome package](https://pypi.org/project/pycryptodome/)
