@@ -149,9 +149,9 @@ def submit(data):
         #data['ShipUnlockStored_Inverse Teleporter'] = {'__type':'bool', 'value': False}
 
     if upgrades:
-        [ data['UnlockedShipObjects']['value'].append(_id) for _id in range(0,24) if _id not in data['UnlockedShipObjects']['value'] and _id not in [5,19]]
+        [ data['UnlockedShipObjects']['value'].append(_id) for _id in range(0,27) if _id not in data['UnlockedShipObjects']['value'] and _id not in [5,19]]
     else:
-        [ data['UnlockedShipObjects']['value'].remove(_id) for _id in range(0,24) if _id in data['UnlockedShipObjects']['value'] and _id not in [5,19]]
+        [ data['UnlockedShipObjects']['value'].remove(_id) for _id in range(0,27) if _id in data['UnlockedShipObjects']['value'] and _id not in [5,19]]
 
     decrypted_result = json.dumps(data)
 
@@ -297,9 +297,14 @@ if __name__ == '__main__':
         66:'comedy',
         67:'whoopie cushion',
     }
+
+    items_v50 = {
+        68:'kitchen knife',
+        69:'easter egg',
+    }
     
     # Use the intersection for whatever versions you want
-    items = items_v40 | items_v45
+    items = items_v40 | items_v45 | items_v50
 
     items_rev_mapping = {v:k for k,v in items.items()}
 
@@ -364,7 +369,12 @@ if __name__ == '__main__':
         67:'whoopie cushion',
     }
 
-    scrap = scrap_v40 | scrap_v45
+    scrap_v50 = {
+        68:'kitchen knife',
+        69:'easter egg',
+    }
+
+    scrap = scrap_v40 | scrap_v45 | scrap_v50
 
     save_itemsv45 = {
         59:'shotgun',
@@ -393,7 +403,6 @@ if __name__ == '__main__':
         save_data = data['shipItemSaveData']['value']
     else:
         data['shipItemSaveData'] = {'__type':'System.Int32[],mscorlib', 'value':[]}
-
     
     # Setting up GUI elements
     root = tk.Tk()
@@ -449,7 +458,20 @@ if __name__ == '__main__':
     quota_passed_text = tk.Label(frm, text='Quotas Completed: ')
     quota_passed_text.grid(row=6, column=0, sticky=tk.W+tk.E, pady=10)
     
-    planets = {0:'Experimentation', 1:'Assurance', 2:'Vow', 3:'Company Building',4:'March',5:'Rend',6:'Dine',7:'Offense',8:'Titan'}
+    planets = {
+        0:'Experimentation',
+        1:'Assurance',
+        2:'Vow',
+        3:'Company',
+        4:'March',
+        5:'Adamance',
+        6:'Rend',
+        7:'Dine',
+        8:'Offense',
+        9:'Titan',
+        10:'Artifice',
+        #11:'Liquidation', NOT OFFICIALLY ADDED YET AS OF V50
+    }
 
     planet_var = tk.IntVar()
     planet_var.set(int(init_planetid))
