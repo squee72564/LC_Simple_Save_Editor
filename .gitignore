@@ -1,1 +1,3 @@
 prev_decrypted_file
+src/encryption/__pycache__/*
+venv/
